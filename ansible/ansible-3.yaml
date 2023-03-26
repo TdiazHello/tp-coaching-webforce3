@@ -1,0 +1,16 @@
+- name: configure firewall
+  hosts: localhost
+  become: true
+  tasks:
+    - name: enable ufw
+      ufw:
+        state: enabled
+    - name: close port 5000
+      ufw:
+        rule: deny port=5000
+    - name: open port 30101
+      ufw:
+        rule: allow port=30101
+    - name: reload ufw
+      ufw:
+        state: reloaded

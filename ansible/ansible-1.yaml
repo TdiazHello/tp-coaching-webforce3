@@ -1,0 +1,22 @@
+- hosts: localhost
+  tasks:
+    - name: Installer les mises à jour avec apt-get
+      become: true
+      command: apt-get update
+
+    - name: Vérification de la version de Python3
+      become: true
+      command: python3 --version
+      register: python_version
+
+    - name: Ajout de l'alias dans ~/.bashrc
+      become: true
+      lineinfile:
+        path: ~/.bashrc
+        line: 'alias python=python3'
+        state: present
+      when: "'python 3.' not in python_version.stdout"
+
+    - name: Installation de pip
+      become: true
+      command: apt-get install -y python3-pip

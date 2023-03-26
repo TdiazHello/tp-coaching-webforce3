@@ -1,0 +1,2 @@
+[alma]
+target2 ansible_host=172.17.0.4 ansible_ssh_user=root ansible_ssh_private_key=/home/tania/tp-coaching-webforce3/ansible/toor
