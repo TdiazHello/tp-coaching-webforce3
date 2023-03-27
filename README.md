@@ -28,6 +28,9 @@ Sector size (logical/physical): 512 bytes / 512 bytes
 I/O size (minimum/optimal): 512 bytes / 512 bytes
 
 sudo mount /dev/vdc /home/ubuntu/tp-coaching-webforce3/log
+sudo vi /etc/fstab
+#write file
+dev/vdc /home/ubuntu/tp-coaching-webforce3/log
 
 # Git/Github 
 Dans PyCharm allez dans File->Settings->Version control->github 
