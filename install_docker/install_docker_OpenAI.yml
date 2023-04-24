@@ -1,0 +1,48 @@
+#Voici un exemple de code Ansible pour installer Docker sur un serveur Ubuntu :
+
+yaml
+Copy code
+---
+- name: Install Docker on Ubuntu
+  hosts: your_server
+  become: true
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install Docker dependencies
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: yes
+      with_items:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - gnupg
+        - lsb-release
+
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} stable
+        state: present
+
+    - name: Install Docker
+      apt:
+        name: docker-ce
+        state: present
+
+#Ce playbook effectue les tâches suivantes :
+
+#Mise à jour du cache APT
+#Installation des dépendances nécessaires à Docker
+#Ajout de la clé GPG Docker
+#Ajout du dépôt Docker
+#Installation de Docker
+#Notez que ce code suppose que le serveur cible est une machine Ubuntu et que les variables Ansible sont correctement définies.
