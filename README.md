@@ -79,23 +79,20 @@ sudo docker images
 
 Pour démarrer le container nommé web sur le port 30101, vous pouvez utiliser la commande Docker suivante :
 
-arduino
-Copy code
+
 docker run -d -p 30101:80 --name web myflaskapp
 Cette commande démarre un nouveau conteneur à partir de l'image myflaskapp avec le nom web et le relie au port 30101 de votre machine hôte.
 
 Pour vérifier les logs de votre conteneur, vous pouvez utiliser la commande suivante :
 
-Copy code
 docker logs web
+
 Pour modifier votre application pour que les données de logging soient placées dans le disque de stockage de l'exercice 3, vous devez modifier la configuration de logging de votre application Flask. Voici un exemple de code pour configurer le logging pour enregistrer les logs dans un fichier app.log :
 
-python
-Copy code
 import logging
 from logging.handlers import RotatingFileHandler
 
-app = Flask(__name__)
+app = Flask(app.py)
 
 # Configuration du logging
 handler = RotatingFileHandler('/path/to/exercise3/app.log', maxBytes=10000, backupCount=1)
@@ -108,3 +105,113 @@ Cette configuration enregistrera tous les logs de l'application Flask dans le fi
 Si vous rencontrez des problèmes avec votre application ou votre conteneur, vous pouvez utiliser les commandes docker ps pour lister les conteneurs en cours d'exécution et docker inspect pour obtenir des informations détaillées sur un conteneur particulier.
 
 Pour vérifier si votre application fonctionne dans un navigateur sur le port 30101, ouvrez votre navigateur et accédez à l'URL http://localhost:30101. Si tout est correctement configuré, vous devriez voir votre application Flask en cours d'exécution.
+
+## Exercice 10 : Mettre votre image Docker dans Docker Hub
+
+https://hub.docker.com/repository/docker/taniad/webflaskalpine
+https://hub.docker.com/repository/docker/taniad/webflaskpython
+
+
+## Exercice 11: Créer un fichier docker-compose de 3 containers.
+
+version: '3'
+
+services:
+  db:
+    image: bitnami/mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: mydatabase
+    volumes:
+      - db_data:/var/lib/mysql
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+    networks:
+      - mynetwork
+
+  app:
+    image: bitnami/phpmyadmin
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "8080:80"
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+
+volumes:
+  db_data:
+container web
+```yaml
+ports:
+      - "30101:5000"
+```
+container db
+```yaml
+ports:
+      - "30432:5432"
+```
+container app
+```yaml
+ports:
+      - "30500:80"
+```
+
+## Exercice 12: Persistance des données dans votre script docker-compose.yml 
+
+Voici le fichier docker-compose.yml modifié pour prendre en compte la persistance des données :
+
+version: '3'
+
+services:
+  db:
+    image: bitnami/mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: mydatabase
+    volumes:
+      - data:/bitnami/mariadb
+    networks:
+      - mynetwork
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./log:/app/log
+    depends_on:
+      - db
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+
+volumes:
+  data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/ubuntu/tp-coaching-webforce3/log
+
+Dans cet exemple, j'ai défini un volume nommé data pour stocker les données de la base de données. Ce volume est défini comme un point de montage de type bind, qui pointe vers le répertoire log sur le disque de l'exercice 3. Le conteneur db utilise ce volume pour stocker les données de la base de données.
+
+Le conteneur web est configuré pour stocker les fichiers journaux dans le répertoire log sur le disque de l'exercice 3. J'ai ajouté un point de montage pour ce répertoire dans la section volumes du conteneur web.
+
+Lorsque on démarrez les conteneurs en utilisant docker-compose up, le volume data sera créé sur le disque de l'exercice 3 et sera utilisé pour stocker les données de la base de données. Les fichiers journaux du conteneur web seront également stockés sur le disque de l'exercice 3, dans le répertoire log.

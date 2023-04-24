@@ -1,0 +1,53 @@
+version: '3'
+
+services:
+  db:
+    image: bitnami/mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: mydatabase
+    volumes:
+      - db_data:/var/lib/mysql
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+    networks:
+      - mynetwork
+
+  app:
+    image: bitnami/phpmyadmin
+    restart: always
+    depends_on:
+      - db
+    ports:
+      - "8080:80"
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+
+volumes:
+  db_data:
+
+container web
+```yaml
+ports:
+      - "30101:5000"
+```
+container db
+```yaml
+ports:
+      - "30432:5432"
+```
+container app
+```yaml
+ports:
+      - "30500:80"
+```

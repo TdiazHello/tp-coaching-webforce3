@@ -1,0 +1,45 @@
+#Voici le fichier docker-compose.yml modifié pour prendre en compte la persistance des données :
+
+version: '3'
+
+services:
+  db:
+    image: bitnami/mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: mydatabase
+    volumes:
+      - data:/bitnami/mariadb
+    networks:
+      - mynetwork
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./log:/app/log
+    depends_on:
+      - db
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+
+volumes:
+  data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/ubuntu/tp-coaching-webforce3/log
+#Dans cet exemple, j'ai défini un volume nommé data pour stocker les données de la base de données. Ce volume est défini comme un point de montage de type bind, qui pointe vers le répertoire log sur le disque de l'exercice 3. Le conteneur db utilise ce volume pour stocker les données de la base de données.
+
+#Le conteneur web est configuré pour stocker les fichiers journaux dans le répertoire log sur le disque de l'exercice 3. J'ai ajouté un point de montage pour ce répertoire dans la section volumes du conteneur web.
+
+#Lorsque vous démarrez les conteneurs en utilisant docker-compose up, le volume data sera créé sur le disque de l'exercice 3 et sera utilisé pour stocker les données de la base de données. Les fichiers journaux du conteneur web seront également stockés sur le disque de l'exercice 3, dans le répertoire log.
